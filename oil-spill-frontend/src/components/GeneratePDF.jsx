@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import axios from "axios";
-import {Button, Spinner} from "@chakra-ui/react";
+import { Button, Spinner } from "@chakra-ui/react"; // Ensure correct Chakra UI import
 
 export default function GeneratePDF() {
   const [loading, setLoading] = useState(false);
@@ -8,15 +8,21 @@ export default function GeneratePDF() {
   const [pdfBlob, setPdfBlob] = useState(null);
   const [error, setError] = useState(null);
 
+  // Retrieve token and UUID from local storage
+  const token = localStorage.getItem("token");
+  const uuid_global = localStorage.getItem("uploaded_file_id");
+
   const handleGeneratePDF = async () => {
+    if (!token || !uuid_global) {
+      setError("Token or UUID missing. Please log in.");
+      return;
+    }
+
     setLoading(true);
     setError(null);
     setPdfBlob(null);
 
     try {
-      const token =
-        "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJhbmkiLCJlbWFpbF9pZCI6ImFuaWtyaXNoMjgwNEBnbWFpbC5jb20iLCJleHAiOjE3NDI4Mzc3OTh9.CPowZPHb-qXjG3JBHHJFQrF0ub5SvofLBxt5xVxMJv0";
-      const uuid_global = "ec8e029e-9ca3-42f3-8c43-51ef4b232738";
       const apiUrl = `http://127.0.0.1:8000/pdf/generate_pdf/?send_mail=${sendMail}&uuid_global=${uuid_global}`;
 
       const response = await axios.post(apiUrl, null, {
@@ -24,7 +30,7 @@ export default function GeneratePDF() {
           Accept: "application/pdf",
           Authorization: `Bearer ${token}`,
         },
-        responseType: "blob", // Ensure we get the PDF file as a blob
+        responseType: "blob",
       });
 
       setPdfBlob(response.data);
@@ -48,7 +54,6 @@ export default function GeneratePDF() {
 
   return (
     <div style={{ textAlign: "center", padding: "16px" }}>
-      {/* Normal Checkbox for Email Sending */}
       <label>
         <input
           type="checkbox"
@@ -60,30 +65,18 @@ export default function GeneratePDF() {
 
       <br /><br />
 
-      {/* Generate PDF Button */}
-      <Button
-              colorScheme="blue"
-              mt={3}
-              onClick={handleGeneratePDF}
-              isDisabled={loading}
-            >
-              {loading ? <Spinner size="sm" /> : "Generate PDF"}
-            </Button>
+      {/* Hide "Generate PDF" button after generating */}
+      {!pdfBlob && (
+        <Button colorScheme="blue" mt={3} onClick={handleGeneratePDF} isDisabled={loading}>
+          {loading ? <Spinner size="sm" /> : "Generate PDF"}
+        </Button>
+      )}
 
-      {/* Download PDF Button */}
+      {/* Show "Download PDF" button only after generation */}
       {pdfBlob && (
-        // <button onClick={handleDownloadPDF} style={{ padding: "8px 16px", margin: "4px", backgroundColor: "green", color: "white" }}>
-        //   Download PDF
-        // </button>
-
-<Button
-colorScheme="blue"
-mt={3}
-onClick={handleDownloadPDF}
-isDisabled={loading}
->
-{loading ? <Spinner size="sm" /> : "Download PDF"}
-</Button>
+        <Button colorScheme="green" mt={3} onClick={handleDownloadPDF}>
+          Download PDF
+        </Button>
       )}
 
       {/* Error Message */}

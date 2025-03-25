@@ -13,10 +13,22 @@ export default function PredictButton() {
     setError(null);
 
     try {
-      const token =
-        "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJhbmkiLCJlbWFpbF9pZCI6ImFuaWtyaXNoMjgwNEBnbWFpbC5jb20iLCJleHAiOjE3NDI4Mzc3OTh9.CPowZPHb-qXjG3JBHHJFQrF0ub5SvofLBxt5xVxMJv0";
+      // Retrieve token and file ID from local storage
+      const token = localStorage.getItem("token");
+      const uuid_global = localStorage.getItem("uploaded_file_id");
 
-      const uuid_global = "ec8e029e-9ca3-42f3-8c43-51ef4b232738";
+      if (!token) {
+        setError("Authentication required. Please log in.");
+        setLoading(false);
+        return;
+      }
+
+      if (!uuid_global) {
+        setError("No uploaded file found. Please upload an image first.");
+        setLoading(false);
+        return;
+      }
+
       const apiUrl = `http://127.0.0.1:8000/prediction/predict?uuid_global=${uuid_global}`;
 
       const res = await axios.post(apiUrl, null, {
@@ -28,7 +40,7 @@ export default function PredictButton() {
 
       setResponse(res.data);
     } catch (err) {
-      setError(err.message || "Error processing request");
+      setError(err.response?.data?.detail || err.message || "Error processing request");
     } finally {
       setLoading(false);
     }

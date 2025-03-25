@@ -9,8 +9,8 @@ export default function MyFileUpload() {
   const [files, setFiles] = useState([]);
   const [message, setMessage] = useState("");
 
-  // Replace with actual token (store in state/localStorage)
-  const token = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJhbmkiLCJlbWFpbF9pZCI6ImFuaWtyaXNoMjgwNEBnbWFpbC5jb20iLCJleHAiOjE3NDI4Mzc3OTh9.CPowZPHb-qXjG3JBHHJFQrF0ub5SvofLBxt5xVxMJv0";
+  // Retrieve token from local storage
+  const token = localStorage.getItem("token");
 
   // Handle File Selection
   const onDrop = useCallback((acceptedFiles) => {
@@ -31,6 +31,11 @@ export default function MyFileUpload() {
       return;
     }
 
+    if (!token) {
+      setMessage("Authentication required. Please log in.");
+      return;
+    }
+
     const formData = new FormData();
     files.forEach((file) => formData.append("files", file));
 
@@ -41,14 +46,16 @@ export default function MyFileUpload() {
         formData,
         {
           headers: {
-            "Authorization": `Bearer ${token}`, // JWT token
-            "Content-Type": "multipart/form-data", // Ensure proper encoding
+            Authorization: `Bearer ${token}`, // JWT token
+            "Content-Type": "multipart/form-data",
           },
         }
       );
 
-      setMessage(`Upload successful! UUID: ${response.data.id}`);
-      console.log(response.data)
+      const { id } = response.data;
+      localStorage.setItem("uploaded_file_id", id); // Store ID in local storage
+      setMessage(`Upload successful! UUID: ${id}`);
+      console.log("Uploaded file ID:", id);
     } catch (error) {
       setMessage(
         `Upload failed: ${error.response?.data?.detail || error.message}`

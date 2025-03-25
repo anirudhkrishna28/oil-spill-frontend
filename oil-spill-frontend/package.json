@@ -14,12 +14,19 @@
     "@chakra-ui/theme-utils": "^2.0.21",
     "@emotion/react": "^11.14.0",
     "@emotion/styled": "^11.14.0",
+    "@mui/icons-material": "^6.4.8",
+    "@mui/lab": "^6.0.0-beta.31",
+    "@mui/material": "^6.4.8",
+    "@mui/system": "^6.4.8",
+    "@toolpad/core": "^0.13.0",
     "framer-motion": "^12.5.0",
     "next-themes": "^0.4.6",
+    "oil-spill-frontend": "file:",
     "react": "^19.0.0",
     "react-dom": "^19.0.0",
     "react-dropzone": "^14.3.8",
-    "react-icons": "^5.5.0"
+    "react-icons": "^5.5.0",
+    "react-router-dom": "^7.4.0"
   },
   "devDependencies": {
     "@eslint/js": "^9.21.0",
