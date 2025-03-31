@@ -5,16 +5,13 @@ import { useTheme } from "@mui/material/styles";
 import { useNavigate, Link } from "react-router-dom"; // Import Link
 import { extendTheme } from "@mui/material/styles";
 import { Box, Typography } from "@mui/material"; // Import Box and Typography for styling
+import WaterDropIcon from '@mui/icons-material/WaterDrop';
 
 const providers = [{ id: "credentials", name: "Email and Password" }];
 
 const BRANDING = {
   logo: (
-    <img
-      src="https://mui.com/static/logo.svg"
-      alt="MUI logo"
-      style={{ height: 32 }}
-    />
+<WaterDropIcon/>
   ),
   title: "Oil Spill Detection",
 };
@@ -75,7 +72,7 @@ export default function Login() {
           signIn={async (provider, formData) => {
             const result = await signIn(provider, formData);
             if (!result.error) {
-              navigate("/dashboard");
+              navigate("/analytics");
             }
             return result;
           }}
@@ -85,7 +82,7 @@ export default function Login() {
             passwordField: { label: "Password", type: "password" },
             submitButton: { children: "Login Now", variant: "contained", color: "primary" },
             title: { children: "Welcome Back!" },
-            subtitle: { children: "Sign in to continue to the Oil Spill Detection Platform" },
+            subtitle: { children: "" },
           }}
         />
 

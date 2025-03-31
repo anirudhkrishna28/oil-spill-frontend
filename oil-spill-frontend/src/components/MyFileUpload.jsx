@@ -9,8 +9,9 @@ export default function MyFileUpload() {
   const [files, setFiles] = useState([]);
   const [message, setMessage] = useState("");
 
-  // Retrieve token from local storage
+  // Retrieve token and existing folder name from local storage
   const token = localStorage.getItem("token");
+  const existingFolder = localStorage.getItem("uploaded_file_id");
 
   // Handle File Selection
   const onDrop = useCallback((acceptedFiles) => {
@@ -39,21 +40,24 @@ export default function MyFileUpload() {
     const formData = new FormData();
     files.forEach((file) => formData.append("files", file));
 
+    const apiUrl = `http://127.0.0.1:8000/file_management/upload-image/?existing=${!!existingFolder}&existing_folder_name=${existingFolder || ""}`;
+
     setUploading(true);
     try {
-      const response = await axios.post(
-        "http://127.0.0.1:8000/file_management/upload-image/",
-        formData,
-        {
-          headers: {
-            Authorization: `Bearer ${token}`, // JWT token
-            "Content-Type": "multipart/form-data",
-          },
-        }
-      );
+      const response = await axios.post(apiUrl, formData, {
+        headers: {
+          Authorization: `Bearer ${token}`, // JWT token
+          "Content-Type": "multipart/form-data",
+        },
+      });
 
       const { id } = response.data;
-      localStorage.setItem("uploaded_file_id", id); // Store ID in local storage
+
+      // Store the folder ID if it's a new upload
+      if (!existingFolder) {
+        localStorage.setItem("uploaded_file_id", id);
+      }
+
       setMessage(`Upload successful! UUID: ${id}`);
       console.log("Uploaded file ID:", id);
     } catch (error) {
