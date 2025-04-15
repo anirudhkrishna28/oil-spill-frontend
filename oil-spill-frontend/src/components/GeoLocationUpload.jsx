@@ -4,31 +4,35 @@ import { Box, Button, Spinner, Text } from "@chakra-ui/react";
 import { LuUpload } from "react-icons/lu";
 import axios from "axios";
 
-export default function MyFileUpload() {
+export default function GeoLocationUpload() {
   const [uploading, setUploading] = useState(false);
-  const [files, setFiles] = useState([]);
+  const [file, setFile] = useState(null);
   const [message, setMessage] = useState("");
 
-  // Retrieve token and existing folder name from local storage
+  // Retrieve token and UUID from local storage
   const token = localStorage.getItem("token");
-  const existingFolder = localStorage.getItem("uploaded_file_id");
+  const uuid = localStorage.getItem("uploaded_file_id");
 
   // Handle File Selection
   const onDrop = useCallback((acceptedFiles) => {
-    setFiles(acceptedFiles);
-    setMessage("");
+    if (acceptedFiles.length > 0) {
+      setFile(acceptedFiles[0]);
+      setMessage("");
+    } else {
+      setMessage("Invalid file format. Please upload a JSON file.");
+    }
   }, []);
 
   const { getRootProps, getInputProps } = useDropzone({
     onDrop,
-    accept: "image/jpeg, image/png",
-    maxSize: 5 * 1024 * 1024, // 5MB max file size
+    accept: "application/json",
+    maxSize: 2 * 1024 * 1024, // 2MB max file size
   });
 
-  // Upload Files using Axios
+  // Upload Metadata using Axios
   const handleUpload = async () => {
-    if (files.length === 0) {
-      setMessage("No files selected!");
+    if (!file) {
+      setMessage("No file selected!");
       return;
     }
 
@@ -37,10 +41,15 @@ export default function MyFileUpload() {
       return;
     }
 
-    const formData = new FormData();
-    files.forEach((file) => formData.append("files", file));
+    if (!uuid) {
+      setMessage("UUID is missing. Please provide a valid UUID.");
+      return;
+    }
 
-    const apiUrl = `http://127.0.0.1:8000/file_management/upload-image/?existing=${!!existingFolder}&existing_folder_name=${existingFolder || ""}`;
+    const formData = new FormData();
+    formData.append("file", file);
+
+    const apiUrl = `http://127.0.0.1:8000/location/upload_metadata?uuid=${uuid}`;
 
     setUploading(true);
     try {
@@ -51,15 +60,7 @@ export default function MyFileUpload() {
         },
       });
 
-      const { id } = response.data;
-
-      // Store the folder ID if it's a new upload
-      if (!existingFolder) {
-        localStorage.setItem("uploaded_file_id", id);
-      }
-
-      setMessage(`Upload successful!`);
-
+      setMessage(response.data.message || "Upload successful!");
     } catch (error) {
       setMessage(
         `Upload failed: ${error.response?.data?.detail || error.message}`
@@ -81,38 +82,28 @@ export default function MyFileUpload() {
       >
         <input {...getInputProps()} />
         <LuUpload size={30} />
-        <Text>Drag & drop images here, or click to select</Text>
-        <Text color="gray.500">.png, .jpg up to 5MB</Text>
+        <Text>Drag & drop a JSON file here, or click to select</Text>
+        <Text color="gray.500">.json file up to 2MB</Text>
       </Box>
 
-      {/* Selected File List */}
+      {/* Selected File Display */}
       <Box mt={3}>
-        {files.map((file) => (
-          <Text key={file.name}>{file.name}</Text>
-        ))}
+        {file && <Text>{file.name}</Text>}
       </Box>
 
       {/* Upload Button */}
       <Button
-      sx={{
-        backgroundColor: "black", // Black button
-        color: "white", // White text
-        "&:hover": {
-          backgroundColor: "#333", // Darker black on hover
-        },
-        marginBottom: 2, // Add spacing below the button
-      }}
         colorScheme="blue"
         mt={3}
         onClick={handleUpload}
         isDisabled={uploading}
       >
-        {uploading ? <Spinner size="sm" /> : "Upload Files"}
+        {uploading ? <Spinner size="sm" /> : "Upload Metadata"}
       </Button>
 
       {/* Display Message */}
       {message && (
-        <Text mt={3} color="red.500">
+        <Text mt={3} color={message.startsWith("Upload successful") ? "green.500" : "red.500"}>
           {message}
         </Text>
       )}

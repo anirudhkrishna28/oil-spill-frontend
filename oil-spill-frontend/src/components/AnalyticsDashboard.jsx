@@ -94,12 +94,13 @@ const AnalyticsDashboard = () => {
       </div>
 
       {/* Time Trends */}
+      {console.log(timeTrends)}
       <Card component={motion.div} whileHover={scaleAnimation} className="time-trends">
         <CardContent>
           <Typography variant="h6">Time Trends</Typography>
           <LineChart
             width={500}
-            height={250}
+            height={350}
             series={[{ data: timeTrends.map((d) => d.avg_spill), label: "Avg Spill %", color: "blue" }]}
             xAxis={[{ data: timeTrends.map((d) => d._id), scaleType: "band" }]}
           />
@@ -181,14 +182,13 @@ const AnalyticsDashboard = () => {
             <BarChart
               width={600}
               height={250}
-              xAxis={[{ scaleType: "band", data: ["Total Spill (UUID)", "Avg Spill (UUID)", "User Total Avg", "Daily Avg"] }]}
+              xAxis={[{ scaleType: "band", data: ["Total Spill (UUID)", "Avg Spill (UUID)", "User Total Avg"] }]}
               series={[
                 {
                   data: [
                     selectedFolderData.total_spill_percentage || 0,
                     selectedFolderData.avg_spill_percentage || 0,
                     summary.avg_spill_percentage || 0,
-                    timeTrends.length > 0 ? timeTrends[0].avg_spill_percentage || 0 : 0,
                   ],
                 },
               ]}

@@ -67,7 +67,16 @@ export default function GeneratePDF() {
 
       {/* Hide "Generate PDF" button after generating */}
       {!pdfBlob && (
-        <Button colorScheme="blue" mt={3} onClick={handleGeneratePDF} isDisabled={loading}>
+        <Button colorScheme="blue" mt={3}
+        sx={{
+            backgroundColor: "black", // Black button
+            color: "white", // White text
+            "&:hover": {
+              backgroundColor: "#333", // Darker black on hover
+            },
+            marginBottom: 2, // Add spacing below the button
+          }}
+         onClick={handleGeneratePDF} isDisabled={loading}>
           {loading ? <Spinner size="sm" /> : "Generate PDF"}
         </Button>
       )}
