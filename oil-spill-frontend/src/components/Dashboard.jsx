@@ -141,7 +141,7 @@ export default function Dashboard() {
           user: {
             name: userData.username,
             email: userData.email_id,
-            image: "https://avatars.githubusercontent.com/u/19550456", // Default avatar or fetch dynamically if available
+            image: "https://www.gravatar.com/avatar/00000000000000000000000000000000?d=mp&f=y", // Default avatar or fetch dynamically if available
           },
         });
       }
@@ -157,7 +157,7 @@ export default function Dashboard() {
           user: {
             name: "Anirudh Krishna",
             email: "anirudhkrishna28@gmail.com",
-            image: "https://avatars.githubusercontent.com/u/19550456",
+            image: "https://www.gravatar.com/avatar/00000000000000000000000000000000?d=mp&f=y",
           },
         });
       },
